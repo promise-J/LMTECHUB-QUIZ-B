@@ -1,6 +1,7 @@
 import { generateToken } from "../libs/generateToken.js";
 import User from "../models/userModel.js";
 import jwt from "jsonwebtoken";
+import bcrypt from 'bcrypt'
 
 export const register = async (req, res) => {
   try {
@@ -16,7 +17,9 @@ export const register = async (req, res) => {
         redirect: "/login",
       });
     }
-    const newUser = await User.create({ email, password, username });
+    const salt = await bcrypt.genSalt(10)
+    const hashPass = await bcrypt.hash(password, salt)
+    const newUser = await User.create({ email, password: hashPass, username });
     return res
       .status(200)
       .json({
@@ -34,13 +37,13 @@ export const login = async (req, res) => {
     const { email, password } = req.body;
     if (!email || !password)
       return res.status(401).json({ message: "Please enter required fields" });
-    const user = await User.findOne({ email }).select("-password");
+    const user = await User.findOne({email});
     if (!user) {
       return res
         .status(404)
         .json({ message: "User not registered", redirect: "/register" });
     }
-    const passIsMatch = user.comparePassword(password)
+    const passIsMatch = await bcrypt.compare(password, user.password)
     if(!passIsMatch){
       return res.status(401).json({message: 'Credentials incorrect'})
     }
