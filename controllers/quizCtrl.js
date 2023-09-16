@@ -104,7 +104,9 @@ export const toggleCandidateToQuiz = async (req, res) => {
         } else {
           sendMail(mailOptions)
           quiz.candidates.push(candidate);
-          await Response.create({quizId: quiz._id, email: candidate})
+          const userResponse = await Response.create({quizId: quiz._id, email: candidate})
+          userResponse.timeLeft = quiz.duration
+          await userResponse.save()
           await quiz.save();
         }
         return res.status(200).json({message: 'Candidate added successfully'});

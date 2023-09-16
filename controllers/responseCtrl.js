@@ -2,7 +2,7 @@ import Response from "../models/reponseModal.js"
 import Quiz from "../models/quizModal.js"
 import User from "../models/userModel.js"
 import { isValidObjectId } from "../utils/isValidObjectId.js"
-import { COMPLETED } from "../utils/constants.js"
+import { COMPLETED, IN_PROGRESS } from "../utils/constants.js"
 
 export const createResponse = async(req, res)=>{
     try {
@@ -53,6 +53,57 @@ export const viewResponseByQuiz = async(req, res)=>{
         if(!isValidQuizId) return res.status(401).json({message: 'Please provide a valid quiz ID'})
         if(!isValidUserId) return res.status(401).json({message: 'Please provide a valid user ID'})
         const response = await Response.find({quizId})
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+export const startResponse = async(req, res)=>{
+    try {
+        const quizId = req.params.quizId
+        const {email} = req.body
+        if(!isValidObjectId(quizId)){
+            return res.status(404).json('Please provide valid quiz object ID')
+        }
+        if(!email){
+            return res.status(404).json('Please provide valid email')
+        }
+
+        const userResponse = await Response.findOne({email, quizId})
+        if(!userResponse){
+            return res.status(404).json('Seems you werent invited')
+        }
+
+        userResponse.responseStatus = IN_PROGRESS
+        await userResponse.save()
+        return res.status(200).json(`${email} quiz is in progress`)
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+export const endResponse = async(req, res)=> {
+    try {
+        
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+export const updateTime = async(req, res)=>{
+    try {
+        const quizId = req.params.quizId
+        const {email, timeLeft} = req.body
+        if(!email){
+            return res.status(404).json({message: 'Please provide an email'})
+        }
+        if(!isValidObjectId(quizId)){
+            return res.status(404).json({message: 'Please provide a valid quiz ID'})
+        }
+        const response = await Response.findOne({email, quizId})
+        response.timeLeft = timeLeft
+        await response.save()
+        return res.status(200).json('Time updated')
     } catch (error) {
         console.log(error)
     }

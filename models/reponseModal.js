@@ -9,14 +9,12 @@ const reponseSchema = new mongoose.Schema(
       required: true,
     },
     response: {
-      type: [Number],
-      default: []
+      type: [],
+      default: [],
     },
-    // userId: {
-    //   type: mongoose.Schema.Types.ObjectId,
-    //   ref: "User",
-    //   required: true,
-    // },
+    timeLeft: {
+      type: Number,
+    },
     email: {
       type: String,
       trim: true,
