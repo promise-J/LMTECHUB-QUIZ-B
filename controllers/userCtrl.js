@@ -40,6 +40,10 @@ export const login = async (req, res) => {
         .status(404)
         .json({ message: "User not registered", redirect: "/register" });
     }
+    const passIsMatch = user.comparePassword(password)
+    if(!passIsMatch){
+      return res.status(401).json({message: 'Credentials incorrect'})
+    }
     const token = generateToken({ id: user._id, role: user.role }, res);
     return res.status(200).json({ user, token });
   } catch (error) {
