@@ -12,7 +12,7 @@ router.route('/profile').get(auth, profile)
 router.route('/user').get(auth, getUser)
 router.route('/user/:email').get(auth, getUserByEmail)
 router.route('/logout').post(authLogout, logout)
-router.route('/users').get(getAllUser)
+router.route('/users').get(auth, getAllUser)
 
 //quizRoutes
 

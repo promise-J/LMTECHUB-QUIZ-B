@@ -18,11 +18,12 @@ const transporter = nodemailer.createTransport({
 //   html: `<h1>This is the first time in a long time</h1>`
 // };
 
-function sendMail(mailOptions) {
+async function sendMail(mailOptions) {
   transporter.sendMail(mailOptions, function (error, info) {
     if (error) {
       console.log(error);
     } else {
+      console.log('maiil sent successfully')
       // do something useful
     }
   });

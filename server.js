@@ -7,13 +7,17 @@ import cookieParser from "cookie-parser";
 import cors from "cors";
 import http from "http";
 import { WebSocketServer } from "ws";
-import { Redis } from "ioredis";
-
 const app = express();
 
 
 
-app.use(cors());
+app.use(cors({
+  origin: "*",
+  // origin: "https://lmtechub-quizy.netlify.app÷",
+  methods: ["GET,HEAD,PUT,PATCH,POST,DELETE"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+}));
+
 app.use(cookieParser());
 app.use(express.json());
 
@@ -119,6 +123,5 @@ function sendMessageToUser(userId, message){
     ws.send(message)
   }
 }
-
 
 

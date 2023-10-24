@@ -1,7 +1,8 @@
 import mongoose from "mongoose";
 import { COMPLETED, IN_PROGRESS, NOT_STARTED } from "../utils/constants.js";
+import QuestionModel from '../models/questionModal.js'
 
-const reponseSchema = new mongoose.Schema(
+const responseSchema = new mongoose.Schema(
   {
     quizId: {
       type: mongoose.Schema.Types.ObjectId,
@@ -18,7 +19,6 @@ const reponseSchema = new mongoose.Schema(
     email: {
       type: String,
       trim: true,
-      unique: true,
       required: true
     },
     responseStatus: {
@@ -29,21 +29,30 @@ const reponseSchema = new mongoose.Schema(
     score: {
       type: Number,
       default: 0
+    },
+    totalScore: {
+      type: Number,
+      default: 0
     }
   },
   { timestamps: true }
 );
 
-reponseSchema.methods.generateResult = function(quizAnswers, userResponse){
+responseSchema.methods.generateResult = async function(quizAnswers, userResponse, quizId){
   let score = 0
+
+  const quizQuestions = await QuestionModel.find({quizId})
+  
   quizAnswers.forEach((qz, idx)=>{
     if(qz== userResponse[idx]){
-      score++
+      const currQuest = quizQuestions[idx]
+      score += currQuest.score
     }
   })
   return score
 }
 
-const Response = mongoose.model("Response", reponseSchema);
+
+const Response = mongoose.model("Response", responseSchema);
 
 export default Response;

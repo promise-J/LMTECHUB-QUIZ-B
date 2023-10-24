@@ -33,8 +33,8 @@ export const createResponse = async(req, res)=>{
         actualQuiz.completedCandidates.push(actualUser.email)
         await actualQuiz.save()
         const quizAnswers = await actualQuiz.getQuizResponse()
-        const theResult = userResponse.generateResult(quizAnswers, response)
-        userResponse.score = theResult
+        const {score} = await userResponse.generateResult(quizAnswers, response, quizId)
+        userResponse.score = score
         userResponse.responseStatus = COMPLETED
         await userResponse.save()
         return res.status(200).json({message: 'Response sent!'})
@@ -63,22 +63,22 @@ export const startResponse = async(req, res)=>{
         const quizId = req.params.quizId
         const {email} = req.body
         if(!isValidObjectId(quizId)){
-            return res.status(404).json('Please provide valid quiz object ID')
+            return res.json('Please provide valid quiz object ID')
         }
         if(!email){
-            return res.status(404).json('Please provide valid email')
+            return res.json('Please provide valid email')
         }
 
         const userResponse = await Response.findOne({email, quizId})
         if(!userResponse){
-            return res.status(404).json('Seems you werent invited')
+            return res.json('Seems you werent invited')
         }
 
         userResponse.responseStatus = IN_PROGRESS
         await userResponse.save()
         return res.status(200).json(`${email} quiz is in progress`)
     } catch (error) {
-        console.log(error)
+        console.log('error')
     }
 }
 

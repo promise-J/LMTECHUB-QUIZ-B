@@ -3,12 +3,11 @@ import User from "../models/userModel.js";
 
 async function auth(req, res, next) {
   let token = req.headers['authorization'];
-  // console.log(req.headers, 'the token')
   try {
-    if (!token) {
+    if (!token || token == null) {
       return res
-        .status(401)
-        .json({ message: "No token. You are not authorized" });
+      .status(401)
+      .json({ message: "No token. You are not authorized" });
     }
     token = token.split(' ')[1]
     const decoded = jwt.verify(token, process.env.SECRET_KEY);
@@ -16,6 +15,7 @@ async function auth(req, res, next) {
     req.user = user
     next();
   } catch (error) {
+    console.log(error.message)
     res.status(500).json({message: error.message})
   }
 }

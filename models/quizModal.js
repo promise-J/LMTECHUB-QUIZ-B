@@ -18,6 +18,7 @@ quizSchema.methods.getQuizResponse = async function(){
   return answers
 }
 
+
 const Quiz = mongoose.model('Quiz', quizSchema)
 
 export default Quiz
