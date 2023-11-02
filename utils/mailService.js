@@ -23,6 +23,7 @@ function sendMail(mailOptions) {
     if (error) {
       console.log(error);
     } else {
+      console.log(info.response)
       // do something useful
     }
   });

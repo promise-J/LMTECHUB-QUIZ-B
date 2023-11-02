@@ -36,19 +36,18 @@ export const login = async (req, res) => {
   try {
     const { email, password } = req.body;
     if (!email || !password)
-      return res.status(401).json({ message: "Please enter required fields" });
+      return res.status.json({ message: "Please enter required fields", success: false });
     const user = await User.findOne({email});
     if (!user) {
       return res
-        .status(404)
-        .json({ message: "User not registered", redirect: "/register" });
+        .json({success: false, message: "User not registered", redirect: "/register" });
     }
     const passIsMatch = await bcrypt.compare(password, user.password)
     if(!passIsMatch){
-      return res.status(401).json({message: 'Credentials incorrect'})
+      return res.json({success: false, message: 'Credentials incorrect'})
     }
     const token = generateToken({ id: user._id, role: user.role }, res);
-    return res.status(200).json({ user, token });
+    return res.status(200).json({ user, token, success: true });
   } catch (error) {
     console.log(error);
   }
@@ -70,7 +69,7 @@ export const logout = async (req, res) => {
 export const getUser = async (req, res) => {
   try {
     const user = await User.findById(req.user.id);
-    if (!user) return res.status(401).json({ message: "User not found" });
+    if (!user) return res.json({success: false, message: "User not found" });
     return res.status(201).json(req.user);
   } catch (error) {
     console.log(error);
@@ -81,7 +80,7 @@ export const getUserByEmail = async(req, res)=>{
   try {
     if(!req.params.email) return res.status(404).json({message: 'Please provide email'})
     const user = await User.findOne({email: req.params.email})
-    if(!user) return res.status(401).json({message: 'User not found'})
+    if(!user) return res.json({success: false, message: 'User not found'})
     return res.status(200).json(user)
   } catch (error) {
     console.log(error)
