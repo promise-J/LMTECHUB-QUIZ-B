@@ -8,6 +8,7 @@ import { isValidObjectId } from "../utils/isValidObjectId.js";
 import QuizService from "../services/quizService.js";
 
 export const createQuiz = async (req, res) => {
+  try{
   const { duration, title } = req.body;
   if (!duration || !title)
     return res.json({
@@ -15,7 +16,6 @@ export const createQuiz = async (req, res) => {
       message: "Please provide a duration and title for the quiz",
     });
   const quizObject = {};
-  try {
     const quizExists = await Quiz.findOne({ title });
     if (quizExists)
       return res.json({
@@ -24,9 +24,6 @@ export const createQuiz = async (req, res) => {
       });
     quizObject.title = title;
     quizObject.duration = duration;
-    // if (candidates && Array.isArray(candidates) && candidates.length > 0) {
-    //   quizObject.candidates = candidates;
-    // }
     const quiz = await Quiz.create(quizObject);
     res.status(200).json(quiz);
   } catch (error) {
@@ -36,12 +33,21 @@ export const createQuiz = async (req, res) => {
 
 export const viewQuiz = async (req, res) => {
   try {
+<<<<<<< HEAD
+    const quizService = new QuizService()
+    const viewQuiz = await quizService.viewQuiz(req, res)
+    if(viewQuiz.success !== true){
+      return res.status(404).json(viewQuiz.error)
+    }else{
+      return res.status(200).json(viewQuiz.data)
+=======
     if (quizId && isvalid) {
       const quiz = await Quiz.findById(quizId);
       if (!quiz) return res.json({ success: false, message: "Quiz not found" });
       return res.status(200).json(quiz);
     } else {
       return res.json({ success: false, message: "Provide valid quizId" });
+>>>>>>> 2de19aa1898977df1acfcf9d46fbd86dfe28dc94
     }
   } catch (error) {
     console.log(error);
@@ -50,6 +56,15 @@ export const viewQuiz = async (req, res) => {
 
 export const viewQuizQuestions = async (req, res) => {
   try {
+<<<<<<< HEAD
+    const quizService = new QuizService()
+    const viewQuizQuestions = await quizService.viewQuizQuestions(req, res)
+    if(viewQuizQuestions.success !== true){
+      return res.status(404).json(viewQuizQuestions.error)
+    }else{
+      return res.status(200).json(viewQuizQuestions.data)
+    }
+=======
     const { quizId } = req.params;
     const isvalid = mongoose.isValidObjectId(quizId);
     if (!quizId || !isvalid)
@@ -60,6 +75,7 @@ export const viewQuizQuestions = async (req, res) => {
     const questions = await Question.find({ quizId }).populate("quizId");
 
     return res.status(200).json(questions);
+>>>>>>> 2de19aa1898977df1acfcf9d46fbd86dfe28dc94
   } catch (error) {
     console.log(error);
   }
@@ -80,6 +96,63 @@ export const viewQuizes = async (req, res) => {
 };
 
 export const toggleCandidateToQuiz = async (req, res) => {
+  try {
+    const quizId = req.params.quizId;
+    const userId = req.user._id;
+    const { candidate } = req.body;
+    const isValidUserId = mongoose.isValidObjectId(userId);
+    if (!userId || !isValidUserId)
+      return res.json({
+        success: false,
+        message: "Please provide a valid user to add",
+      });
+    if (!candidate) {
+      return res.json({ success: false, message: "Please provide candidate" });
+    }
+    if (quizId) {
+      const quiz = await Quiz.findById(quizId);
+      const existUserResponse = await Response.findOne({quizId, email: candidate})
+      const mailOptions = {
+        from: "LMtechub.com",
+        to: candidate,
+        subject: "Invitation for a Quiz",
+        html: inviteTemplate(quizId, quiz.title),
+      };
+      if (quiz) {
+        if(existUserResponse){
+          return res.json({success: false, message: 'Candidate has already been added'})
+        }
+        if (quiz.candidates.includes(candidate)) {
+          const quizIdx = quiz.candidates.findIndex((c) => c == candidate);
+          quiz.candidates.splice(quizIdx, 1);
+          await quiz.save();
+          return res.json({ success: true, message: "Candidate removed" });
+        } else {
+          sendMail(mailOptions);
+          quiz.candidates.push(candidate);
+          const userResponse = await Response.create({
+            quizId: quiz._id,
+            email: candidate,
+          });
+          userResponse.timeLeft = quiz.duration;
+          await userResponse.save();
+          await quiz.save();
+          return res.json({
+            success: true,
+            message: "Candidate added successfully",
+          });
+        }
+      } else {
+        return res.json({ success: false, message: "Quiz not found" });
+      }
+  } else {
+  return res.json({ success: false, message: "Provide Quiz Id" });
+  } }catch (error) {
+    console.log(error,'the error');
+  }
+};
+
+export const updateQuiz = async (req, res) => {
   try {
     const quizId = req.params.quizId;
     const userId = req.user._id;
@@ -153,11 +226,21 @@ export const deleteQuiz = async (req, res) => {
 
 export const monitorQuiz = async (req, res) => {
   try {
+<<<<<<< HEAD
+    const quizService = new QuizService()
+    const monitorQuiz = await quizService.monitorQuiz(req, res)
+    if(monitorQuiz.success !== true){
+      return res.status(404).json(monitorQuiz.error)
+    }else{
+      return res.status(200).json(monitorQuiz.data)
+    }
+=======
     const quizId = req.params.quizId;
     const isValidQuizId = isValidObjectId(quizId);
     if (!isValidObjectId) return res.status(401).json("Quiz Id is not valid");
     const quizResponse = await Response.find({ quizId });
     return res.status(200).json(quizResponse);
+>>>>>>> 2de19aa1898977df1acfcf9d46fbd86dfe28dc94
   } catch (error) {
     console.log(error);
     return res.status(500).json("Server error");
