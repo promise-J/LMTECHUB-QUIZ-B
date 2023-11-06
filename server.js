@@ -21,6 +21,9 @@ app.use(cors({
 app.use(cookieParser());
 app.use(express.json());
 
+app.get('/', (req, res)=>{
+  res.send('Welcome to the homepage')
+})
 app.use("/api", allRouter);
 
 
