@@ -56,15 +56,6 @@ export const viewQuiz = async (req, res) => {
 
 export const viewQuizQuestions = async (req, res) => {
   try {
-<<<<<<< HEAD
-    const quizService = new QuizService()
-    const viewQuizQuestions = await quizService.viewQuizQuestions(req, res)
-    if(viewQuizQuestions.success !== true){
-      return res.status(404).json(viewQuizQuestions.error)
-    }else{
-      return res.status(200).json(viewQuizQuestions.data)
-    }
-=======
     const { quizId } = req.params;
     const isvalid = mongoose.isValidObjectId(quizId);
     if (!quizId || !isvalid)
@@ -75,7 +66,6 @@ export const viewQuizQuestions = async (req, res) => {
     const questions = await Question.find({ quizId }).populate("quizId");
 
     return res.status(200).json(questions);
->>>>>>> 2de19aa1898977df1acfcf9d46fbd86dfe28dc94
   } catch (error) {
     console.log(error);
   }
@@ -226,21 +216,11 @@ export const deleteQuiz = async (req, res) => {
 
 export const monitorQuiz = async (req, res) => {
   try {
-<<<<<<< HEAD
-    const quizService = new QuizService()
-    const monitorQuiz = await quizService.monitorQuiz(req, res)
-    if(monitorQuiz.success !== true){
-      return res.status(404).json(monitorQuiz.error)
-    }else{
-      return res.status(200).json(monitorQuiz.data)
-    }
-=======
     const quizId = req.params.quizId;
     const isValidQuizId = isValidObjectId(quizId);
     if (!isValidObjectId) return res.status(401).json("Quiz Id is not valid");
     const quizResponse = await Response.find({ quizId });
     return res.status(200).json(quizResponse);
->>>>>>> 2de19aa1898977df1acfcf9d46fbd86dfe28dc94
   } catch (error) {
     console.log(error);
     return res.status(500).json("Server error");
