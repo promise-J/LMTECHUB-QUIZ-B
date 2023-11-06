@@ -33,21 +33,12 @@ export const createQuiz = async (req, res) => {
 
 export const viewQuiz = async (req, res) => {
   try {
-<<<<<<< HEAD
-    const quizService = new QuizService()
-    const viewQuiz = await quizService.viewQuiz(req, res)
-    if(viewQuiz.success !== true){
-      return res.status(404).json(viewQuiz.error)
-    }else{
-      return res.status(200).json(viewQuiz.data)
-=======
     if (quizId && isvalid) {
       const quiz = await Quiz.findById(quizId);
       if (!quiz) return res.json({ success: false, message: "Quiz not found" });
       return res.status(200).json(quiz);
     } else {
       return res.json({ success: false, message: "Provide valid quizId" });
->>>>>>> 2de19aa1898977df1acfcf9d46fbd86dfe28dc94
     }
   } catch (error) {
     console.log(error);
