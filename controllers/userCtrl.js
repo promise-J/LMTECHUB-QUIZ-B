@@ -6,17 +6,64 @@ import UserService from "../services/userService.js";
 
 export const register = async (req, res) => {
   try {
-    const userService = new UserService()
-    const register = await userService.register(req, res)
-    if(register.success !== true){
-      return res.status(404).json({message: register.error})
-    }else{
-      return res.status(200).json(register.data)
+
+    const { username, email, password, role } = req.body;
+    if (!username || !email)
+      return res
+        .json({ message: "Please enter the required fields" });
+    const userExists = await User.findOne({ email });
+    if (userExists) {
+      return res.json({
+        message: "User already exist, please login",
+        redirect: "/login",
+      });
     }
+    const newUser = {
+      email,
+      username
+    }
+    if(password){
+      const salt = await bcrypt.genSalt(10)
+      const hashPass = await bcrypt.hash(password, salt)
+      newUser.password = hashPass
+    }
+    if(role){
+      newUser.role = role
+    }
+    const user = await User.create(newUser);
+    return res
+      .status(200)
+      .json({
+        success: true,
+        email: user.email,
+        username: user.username,
+        redirect: "/login",
+      });
   } catch (error) {
+    return res.json({success: false, message: 'Something went wrong'})
     console.log(error);
   }
 };
+
+export const googleAuth = async(req, res)=>{
+  try {
+    const {email, displayName} = req.body
+    const firstName = displayName.split(' ')[0]
+    if(!email){
+      res.json({success: false, message: 'Please provide email'})
+    }
+    const userExist = await User.findOne({email: email})
+    if(userExist){
+      const token = generateToken({ id: userExist._id, role: userExist.role }, res);
+      return res.status(200).json({ success: true, user: userExist, token });
+    }
+    const user = await User.create({email, username: firstName})
+    const token = generateToken({ id: user._id, role: user.role }, res);
+    return res.status(200).json({ success: true, user, token });
+  } catch (error) {
+    console.log(error)
+  }
+}
 
 export const login = async (req, res) => {
   try {
@@ -44,7 +91,6 @@ export const logout = async (req, res) => {
     let token = req.headers;
     token = token.split(" ")[1];
     jwt.destroy(token);
-    console.log('logging out')
     res.status(200).json({ message: "Logged out!" });
   } catch (error) {
     console.log(error);

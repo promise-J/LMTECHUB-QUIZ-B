@@ -10,7 +10,7 @@ import QuizService from "../services/quizService.js";
 export const createQuiz = async (req, res) => {
   try{
   const { duration, title } = req.body;
-  if (!duration || !title)
+  if (!duration || !title)ˇ
     return res.json({
       success: false,
       message: "Please provide a duration and title for the quiz",
