@@ -6,8 +6,9 @@ import allRouter from "./routes/index.js";
 import cookieParser from "cookie-parser";
 import cors from "cors";
 import http from "http";
+
 import { WebSocketServer } from "ws";
-import { Redis } from "ioredis";
+// import { Redis } from "ioredis";
 
 const app = express();
 
@@ -21,6 +22,8 @@ app.get('/', (req, res)=>{
   res.send('Welcome to the homepage')
 })
 app.use("/api", allRouter);
+
+
 
 
 
