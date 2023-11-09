@@ -3,6 +3,7 @@ import Question from './questionModal.js'
 
 const quizSchema = new mongoose.Schema({
   title: {type: String, required: true, unique: true},
+  userId: { type: mongoose.Schema.Types.ObjectId, required: true, ref: 'User' },
   duration: {type: Number, required: true},
   candidates: {type: [String], default: []},
   completedCandidates: {type: [String], default: []}

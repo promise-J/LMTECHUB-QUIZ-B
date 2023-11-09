@@ -72,7 +72,7 @@ class QuizService extends BaseService {
 
   async viewQuizes(req, res) {
     try {
-      const quizes = await Quiz.find();
+      const quizes = await Quiz.find({userId: req.user._id});
       return QuizService.sendSuccessResponse(quizes);
     } catch (error) {
       return QuizService.sendFailedResponse(this.server_error);
@@ -94,7 +94,7 @@ class QuizService extends BaseService {
         return QuizService.sendFailedResponse("Pleas provide candidate");
       }
       if (quizId) {
-        const quiz = await Quiz.findById(quizId);
+        const quiz = await Quiz.findOne({_id: quizId, userId: req.user._id});
         const mailOptions = {
           from: "LMtechub.com",
           to: "chiemelapromise30@gmail.com",
@@ -111,7 +111,7 @@ class QuizService extends BaseService {
               const quizIdx = quiz.candidates.findIndex((c) => c == candidate);
               quiz.candidates.splice(quizIdx, 1);
               await quiz.save();
-              await Response.findByIdAndDelete(responseExists._id);
+              await Response.findOneAndDelete(responseExists._id);
             }
             return QuizService.sendFailedResponse(
               "Candidate has now been removed"
@@ -166,7 +166,7 @@ class QuizService extends BaseService {
         update_data['duration'] = duration
       }
 
-      const updatedQuiz = await Quiz.findByIdAndUpdate(quizId, update_data, {new: true})
+      const updatedQuiz = await Quiz.findOneAndUpdate({_id: quizId, userId: req.user._id}, update_data, {new: true})
       return QuizService.sendSuccessResponse('Quiz updated successful')
     } catch (error) {
       return QuizService.sendFailedResponse(this.server_error)
@@ -180,11 +180,11 @@ class QuizService extends BaseService {
       if (!quizId || !isValidQuizId) {
         return QuizService.sendFailedResponse("Please enter a valid quiz ID");
       }
-      const questions = await Question.find({ quizId });
+      const questions = await Question.find({ quizId, userId: req.user._id });
       for (const q of questions) {
         await q.deleteOne();
       }
-      await Quiz.findByIdAndDelete(quizId);
+      await Quiz.findOneAndDelete({_id: quizId, userId: req.user._id});
       return QuizService.sendSuccessResponse({ message: "Quiz deleted" });
     } catch (error) {
       return QuizService.sendFailedResponse(this.server_error);

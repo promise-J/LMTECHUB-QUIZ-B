@@ -1,4 +1,4 @@
-import { empty } from "../utils/helpers.js"
+import { empty, isArray } from "../utils/helpers.js"
 
 class BaseService {
     constructor(){
@@ -14,7 +14,7 @@ class BaseService {
     }
     static sendSuccessResponse(data){
         let returnData = {success: true}
-        if(!empty(data)){
+        if(!empty(data) || isArray(data)){
             returnData.data = data
         }
         return returnData

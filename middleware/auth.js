@@ -15,22 +15,18 @@ async function auth(req, res, next) {
     req.user = user
     next();
   } catch (error) {
-    console.log(error.message)
-    res.status(500).json({message: error.message})
+    res.status(500).json({message: error.message, success: false})
   }
 }
 
 export const authLogout = (req, res, next)=>{
   let token = req.headers['authorization']
-  console.log('logging out', token)
   try {
     if(!token){
       return res.status(401).json('Please provide a token')
     }
-    console.log(token)
     next()
   } catch (error) {
-    console.log(error)
   }
 }
 

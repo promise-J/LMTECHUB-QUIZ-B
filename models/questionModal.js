@@ -2,7 +2,8 @@ import mongoose from "mongoose";
 
 const questionSchema = new mongoose.Schema({
   quizId: { type: mongoose.Schema.Types.ObjectId, required: true, ref: 'Quiz' },
-  questionType: {type: String, required: true, enum: ['theory', 'objective', 'sub_objective'], default: 'theory'},
+  userId: { type: mongoose.Schema.Types.ObjectId, required: true, ref: 'User' },
+  questionType: {type: String, required: true, enum: ['theory', 'objective', 'sub_objective']},
   title: {type: String, required: true},
   options: { type: [String], required: true, default: []},
   score: {type: Number, required: true, default: 0},

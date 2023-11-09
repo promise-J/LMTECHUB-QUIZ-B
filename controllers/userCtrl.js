@@ -11,10 +11,17 @@ export const register = async (req, res) => {
     if (!username || !email)
       return res
         .json({ message: "Please enter the required fields" });
-    const userExists = await User.findOne({ email });
+    let userExists = await User.findOne({ email });
     if (userExists) {
       return res.json({
-        message: "User already exist, please login",
+        message: "Email already exist, please login",
+        redirect: "/login",
+      });
+    }
+    userExists = await User.findOne({username})
+    if (userExists) {
+      return res.json({
+        message: "Username already exist, please login",
         redirect: "/login",
       });
     }
@@ -47,19 +54,20 @@ export const register = async (req, res) => {
 
 export const googleAuth = async(req, res)=>{
   try {
-    const {email, displayName} = req.body
-    const firstName = displayName.split(' ')[0]
+    const {email, displayName, avatar} = req.body
+    // const firstName = displayName.split(' ')[0]
     if(!email){
       res.json({success: false, message: 'Please provide email'})
     }
     const userExist = await User.findOne({email: email})
-    if(userExist){
-      const token = generateToken({ id: userExist._id, role: userExist.role }, res);
-      return res.status(200).json({ success: true, user: userExist, token });
+    if(!userExist){
+      return res.json({success: false, message: 'Please proceed to signup', redirect: '/register'})
     }
-    const user = await User.create({email, username: firstName})
-    const token = generateToken({ id: user._id, role: user.role }, res);
-    return res.status(200).json({ success: true, user, token });
+    userExist.avatar = avatar
+    await userExist.save()
+
+    const token = generateToken({ id: userExist._id, role: userExist.role }, res);
+    return res.status(200).json({ success: true, user: userExist, token });
   } catch (error) {
     console.log(error)
   }
@@ -103,7 +111,8 @@ export const getUser = async (req, res) => {
     if (!user) return res.json({success: false, message: "User not found" });
     return res.status(201).json(req.user);
   } catch (error) {
-    console.log(error);
+    res.json({success: false, message: 'User not found', error: 'server'})
+    console.log(error.message)
   }
 };
 

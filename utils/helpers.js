@@ -25,7 +25,7 @@ const isNumber = (data)=> typeof data === 'number'
 const isNull = (data)=>  data === null ? true : false
 const isUndefined = (data)=> typeof data === 'undefined'
 const isObject = (data)=> (typeof data === "object" && Object.prototype.toString.call(data) === "[object Object]") ? true : false;
-const isArray = (data)=>  (typeof data === "object" && Object.prototype.toString.call(data) === "[object Array]") || Array.isArray(data) ? true : false;
+export const isArray = (data)=>  (typeof data === "object" && Object.prototype.toString.call(data) === "[object Array]") || Array.isArray(data) ? true : false;
 
 export const hashUserPassword = async (password)=>{
     const salt = await bcrypt.genSalt(10);

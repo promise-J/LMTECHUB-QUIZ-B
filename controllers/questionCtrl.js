@@ -20,6 +20,7 @@ export const createQuestion = async (req, res) => {
       options,
       correctOption: +correctOption,
       title,
+      userId: req.user._id
     });
     res.status(200).json(question);
   } catch (error) {
@@ -38,7 +39,7 @@ export const editQuestion = async (req, res) => {
     .json({ message: "Please provide a valid question Id" });
     // const questionExists = await Question.find({title})
     // if(questionExists) return res.status(401).json({message: 'Question title already exist in your quiz catalog'})
-    const question = await Question.findById(questionId);
+    const question = await Question.findOne({_id: questionId, userId: req.user._id});
     if (options.length > 0) {
       question.options = options;
     }
@@ -71,7 +72,7 @@ export const deleteQuestion = async (req, res) => {
         .json({ message: "Please provide a valid question Id" });
     
     
-    await Question.findByIdAndDelete(questionId);
+    await Question.findOneAndDelete({_id: questionId, userId: req.user._id});
     return res.status(200).json({ message: "Question Deleted!" });
   } catch (error) {
     console.log(error);

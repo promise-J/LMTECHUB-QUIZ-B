@@ -6,8 +6,8 @@ import auth from '../middleware/auth.js'
 const router = express.Router()
 
 router.route('/quiz').post(auth, createQuiz)
-router.route('/quiz/:quizId').get(viewQuiz).delete(auth, deleteQuiz).put(auth, updateQuiz)
-router.route('/quiz/questions/:quizId').get(viewQuizQuestions)
+router.route('/quiz/:quizId').get(auth, viewQuiz).delete(auth, deleteQuiz).put(auth, updateQuiz)
+router.route('/quiz/questions/:quizId').get(auth, viewQuizQuestions)
 router.route('/quiz/response/:quizId').get(auth, monitorQuiz)
 router.route('/quiz/addCandidate/:quizId').put(auth, toggleCandidateToQuiz)
 router.route('/quizes').get(auth, viewQuizes)
