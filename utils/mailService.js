@@ -11,13 +11,6 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-// const mailOptions = {
-//   from: "hello@example.com",
-//   to: "reciever@gmail.com",
-//   subject: "Subject",
-//   html: `<h1>This is the first time in a long time</h1>`
-// };
-
 async function sendMail(mailOptions) {
   transporter.sendMail(mailOptions, function (error, info) {
     if (error) {

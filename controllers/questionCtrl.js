@@ -3,26 +3,39 @@ import Question from "../models/questionModal.js";
 
 export const createQuestion = async (req, res) => {
   try {
-    const { quizId, options, correctOption, title } = req.body;
-    // const questionExists = await Question.findOne({ title });
-    // if (questionExists)
-      // return res.status(401).json({ message: "Question title already exists" });
+    const newQuestion = {}
+    const { quizId, options, correctOption, title, questionType, score, theory, subobjective } = req.body;
     const isValidQuizId = mongoose.isValidObjectId(quizId);
     if (!isValidQuizId)
-      return res.status(401).json({ message: "Please enter a valid quiz Id" });
-      if (!options || isNaN(correctOption) || !title) {
+      return res.json({ success: false, message: "Please enter a valid quiz Id" });
+      if (!title || !questionType || !score) {
       return res
-        .status(404)
-        .json({ message: "Please enter options, correct option and title" });
+        .json({success: false, message: "Please enter options, correct option, question type and title" });
     }
-    const question = await Question.create({
-      quizId,
-      options,
-      correctOption: +correctOption,
-      title,
-      userId: req.user._id
-    });
-    res.status(200).json(question);
+    
+    newQuestion.quizId = quizId
+    newQuestion.title = title
+    newQuestion.userId = req.user._id
+    newQuestion.score = score
+
+    if(questionType=='objective'){
+      newQuestion.options = options
+      newQuestion.correctOption = +correctOption
+      newQuestion.questionType = questionType
+    }
+
+    if(questionType=='theory'){
+      newQuestion.questionType = questionType
+      newQuestion.theory = theory
+    }
+
+    if(questionType=='subobjective'){
+      newQuestion.questionType = questionType
+      newQuestion.subobjective = subobjective
+    }
+
+    const question = await Question.create(newQuestion);
+    res.json({success: true, message: question});
   } catch (error) {
     console.log(error);
   }
@@ -35,8 +48,7 @@ export const editQuestion = async (req, res) => {
     const isValidQuestionId = mongoose.isValidObjectId(questionId);
     if (!questionId || !isValidQuestionId)
     return res
-    .status(401)
-    .json({ message: "Please provide a valid question Id" });
+    .json({ success: false, message: "Please provide a valid question Id" });
     // const questionExists = await Question.find({title})
     // if(questionExists) return res.status(401).json({message: 'Question title already exist in your quiz catalog'})
     const question = await Question.findOne({_id: questionId, userId: req.user._id});
@@ -56,7 +68,7 @@ export const editQuestion = async (req, res) => {
       question.questionType = questionType;
     }
     await question.save();
-    return res.status(200).json({question});
+    return res.json({success: true, message: question});
   } catch (error) {
     console.log(error);
   }
@@ -66,14 +78,12 @@ export const deleteQuestion = async (req, res) => {
   try {
     const questionId = req.params.questionId;
     const isValidQuestionId = mongoose.isValidObjectId(questionId);
-    if (!questionId || !isValidQuestionId)
-      return res
-        .status(401)
-        .json({ message: "Please provide a valid question Id" });
-    
+    if (!questionId || !isValidQuestionId){
+      return res.json({success: false, message: "Please provide a valid question Id" });
+    }
     
     await Question.findOneAndDelete({_id: questionId, userId: req.user._id});
-    return res.status(200).json({ message: "Question Deleted!" });
+    return res.json({success: true, message: "Question Deleted!" });
   } catch (error) {
     console.log(error);
   }
